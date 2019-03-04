@@ -15,8 +15,8 @@ The purpose of this policy is to control the rate of traffic sent to the
 upstream API. There are several kinds of limits that can be defined. Here are
 some examples:
 
-- The client with address 127.0.0.1 can access the specific endpoint
-`/something` up to 100 times per minute.
+- The client with address 127.0.0.1 can access the specific API
+`http://example.com` up to 100 times per minute.
 - Requests that contain a JSON web token (JWT) whose `sub` claim has the value
 `abc` can make up to 10 calls to the API per second.
 
@@ -38,7 +38,7 @@ Any limit can be scoped by service or globally.
 ## Limit definition
 
 The limits have a key that encodes the entities that we want to use to define
-the limit (an IP, a service, an endpoint, an ID, the value for a specific
+the limit (an IP, a service, an ID, the value for a specific
 header, etc.). Each limit also has some parameters that vary depending on the
 type:
 
