@@ -140,6 +140,17 @@ local function proxy_http_request(sock, method, url, http_version, upstream)
         return nil, err
     end
 
+    if uri[1] == 'https' then
+        ok, err = upstream:sslhandshake()
+
+        if ok then
+            ngx.log(ngx.DEBUG, 'connected to TLS upstream ', host, ':', port)
+        else
+            ngx.log(ngx.ERR, 'failed to establish TLS connection to ', host, ':', port, ' err: ', err)
+            return nil, err
+        end
+    end
+
     local req_line = format('%s %s %s%s', method, uri[4] or '/', http_version, cr_lf)
 
     send(upstream, req_line)
