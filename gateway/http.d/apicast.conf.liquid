@@ -90,7 +90,7 @@ server {
   {% include "conf.d/apicast.conf" %}
 }
 
-{% if port.metrics %}
+{% if false %}
   lua_shared_dict prometheus_metrics 16M;
   server {
     access_log off;

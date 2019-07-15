@@ -30,6 +30,7 @@ local GC = require('apicast.gc')
 local setmetatable_gc_clone = GC.setmetatable_gc_clone
 local ipairs = ipairs
 local format = string.format
+local setmetatable = setmetatable
 
 local noop = function() end
 
@@ -61,7 +62,7 @@ function _M.new(name, version)
         return p
     end
 
-    for _, phase in _M.phases() do
+    for _, phase in ipairs(PHASES) do--_M.phases() do
         policy[phase] = noop
     end
 

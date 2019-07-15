@@ -38,10 +38,14 @@ local function build_context(executor)
 end
 
 local function shared_build_context(executor)
+    --[[
     local ok, ctx = pcall(function() return ngx.ctx end)
     if not ok then
       ctx = {}
     end
+--]]
+
+    local ctx = ngx.ctx
 
     local context = ctx.context
 

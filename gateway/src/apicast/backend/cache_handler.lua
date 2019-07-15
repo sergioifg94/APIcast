@@ -20,7 +20,7 @@ local mt = {
 
 function _M.new(handler)
   local name = handler or _M.handlers.default
-  ngx.log(ngx.DEBUG, 'backend cache handler: ', name)
+  --ngx.log(ngx.DEBUG, 'backend cache handler: ', name)
   return setmetatable({ handler = name }, mt)
 end
 
