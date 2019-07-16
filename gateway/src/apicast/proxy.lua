@@ -59,7 +59,7 @@ function _M.new(configuration)
 
   local cache_handler = backend_cache_handler.new(env.get('APICAST_BACKEND_CACHE_HANDLER'))
 
-  return setmetatable({
+  local self = setmetatable({
     configuration = assert(configuration, 'missing proxy configuration'),
     cache = cache,
     cache_handler = cache_handler,
@@ -70,6 +70,8 @@ function _M.new(configuration)
     -- This allows us, for example, to send a referrer.
     extra_params_backend_authrep = {}
   }, mt)
+
+  return self
 end
 
 local function debug_header_enabled(service)

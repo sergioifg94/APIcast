@@ -66,7 +66,8 @@ function _M.new(name, version)
         policy[phase] = noop
     end
 
-    return setmetatable(policy, { __tostring = __tostring, __eq = __eq }), mt
+    local new_policy = setmetatable(policy, { __tostring = __tostring, __eq = __eq })
+    return new_policy, mt
 end
 
 function _M.phases()

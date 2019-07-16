@@ -21,9 +21,11 @@ function _M.shared()
 end
 
 function _M.new(cache)
-  return setmetatable({
+  local self = setmetatable({
     cache = cache or resty_lrucache.new(100)
   }, mt)
+
+  return self
 end
 
 local function compact_answers(servers)

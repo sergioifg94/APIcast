@@ -43,6 +43,7 @@ local function split_path(path)
     end
 end
 
+-- Hardcoded the result
 local function parse_url(url)
     local parsed, err = resty_url.split(url)
 
@@ -74,7 +75,7 @@ function _M.new(url)
         return nil, 'invalid upstream'
     end
 
-    return setmetatable({
+    local self = setmetatable({
         uri = uri,
         resolver = resty_resolver,
         -- @upstream location is defined in apicast.conf
@@ -82,6 +83,8 @@ function _M.new(url)
         -- upstream is defined in upstream.conf
         upstream_name = 'upstream',
     }, mt)
+
+    return self
 end
 
 --- Resolve upstream servers.

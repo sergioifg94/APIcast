@@ -28,10 +28,12 @@ local rw_mt = {
 }
 
 local function linked_list(item, next, mt)
-    return setmetatable({
+    local list = setmetatable({
         current = item or empty_t,
         next = next or empty_t
     }, mt)
+
+    return list
 end
 
 local function readonly_linked_list(item, next)

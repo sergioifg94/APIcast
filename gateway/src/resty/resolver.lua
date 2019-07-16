@@ -73,7 +73,9 @@ function nameserver.new(host, port)
     -- then it is likely ipv6 without [ ] around
     host = format('[%s]', host)
   end
-  return setmetatable({ host, port or default_resolver_port }, nameserver.mt)
+
+  local self = setmetatable({ host, port or default_resolver_port }, nameserver.mt)
+  return self
 end
 
 function _M.reset()
@@ -194,12 +196,14 @@ function _M.new(dns, opts)
 
   ngx.log(ngx.DEBUG, 'resolver search domains: ', concat(search, ' '))
 
-  return setmetatable({
+  local self =  setmetatable({
     dns = dns,
     options = { qtype = dns.TYPE_A },
     cache = cache,
     search = search
   }, mt)
+
+  return self
 end
 
 function _M:instance()
@@ -226,11 +230,13 @@ local function new_server(answer, port)
   local address = answer.address
   if not address then return nil, 'server missing address' end
 
-  return setmetatable({
+  local server = setmetatable({
     address = answer.address,
     ttl = answer.ttl,
     port = port or answer.port,
   }, server_mt)
+
+  return server
 end
 
 local function new_answer(address, port)
@@ -270,7 +276,9 @@ local function convert_answers(answers, port)
 
   servers.answers = answers
 
-  return setmetatable(servers, servers_mt)
+  local res = setmetatable(servers, servers_mt)
+
+  return res
 end
 
 local empty = {}

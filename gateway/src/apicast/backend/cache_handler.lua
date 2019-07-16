@@ -21,7 +21,9 @@ local mt = {
 function _M.new(handler)
   local name = handler or _M.handlers.default
   --ngx.log(ngx.DEBUG, 'backend cache handler: ', name)
-  return setmetatable({ handler = name }, mt)
+
+  local self = setmetatable({ handler = name }, mt)
+  return self
 end
 
 local function cached_key_var()
