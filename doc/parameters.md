@@ -23,7 +23,7 @@ Resilient will do so only on getting authorization denied from backend.
 
 Specifies the period (in seconds) that the configuration will be stored in the cache for. Can take the following values:
 - `0`: disables the cache. The configuration will not be not stored. This is not compatible with `boot` mode of `APICAST_CONFIGURATION_LOADER` parameter. When used together with `lazy` value of `APICAST_CONFIGURATION_LOADER`, APIcast will reload the configuration on every request.
-- a positive number ( > 0 ): specifies the interval in seconds between configuration reload. For example, when APIcast is started with `APICAST_CONFIGURATION_CACHE=300` and `APICAST_CONFIGURATION_CACHE=boot`, it will load the configuration on boot, and will reload it every 5 minutes (300 seconds).
+- a positive number ( > 0 ): specifies the interval in seconds between configuration reload. For example, when APIcast is started with `APICAST_CONFIGURATION_CACHE=300` and `APICAST_CONFIGURATION_LOADER=boot`, it will load the configuration on boot, and will reload it every 5 minutes (300 seconds).
 - a negative number ( < 0 ): disables reloading. The cache entries will never be removed from the cache once stored, and the configuration will never be reloaded.
 
 ### `APICAST_CONFIGURATION_LOADER`
