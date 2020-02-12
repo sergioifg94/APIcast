@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Fixed:
+
+- Check status is bigger than zero on caching policy [THREESCALE-4471](https://issues.jboss.org/browse/THREESCALE-4471) [PR #1163](https://github.com/3scale/APIcast/pull/1163)
+
+## [3.7.0-alpha1]
+
 ### Added
 
 - Now the configuration of the issuer is cached to avoid flip-flop issues when OIDC connectivity fails. [THREESCALE-3809](https://issues.jboss.org/browse/THREESCALE-3809) [PR #1141](https://github.com/3scale/APIcast/pull/1141)
