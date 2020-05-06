@@ -90,4 +90,6 @@ function _M.to_hash(table)
   return t
 end
 
+_M.read_file = read
+
 return _M
