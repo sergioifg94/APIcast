@@ -177,6 +177,9 @@ function _M.filter_services(services, subset)
 end
 
 function _M.filter_oidc_config(services, oidc)
+  ngx.log(ngx.ERR, "FILTER-OIDC Number services", #(services or {}))
+  ngx.log(ngx.ERR, "FILTER-OIDC Number oidc", #(oidc or {}))
+
   local services_ids = {}
   for _,service in ipairs(services or {}) do
     services_ids[service.id] = 1
@@ -190,7 +193,11 @@ function _M.filter_oidc_config(services, oidc)
     if oidc_config then
       if not oidc_config.service_id or services_ids[tostring(oidc_config.service_id)] then
         table.insert(oidc_final_config, oidc_config)
+      else
+        ngx.log(ngx.ERR, "FILTER-OIDC--->SKIP")
       end
+    else
+      ngx.log(ngx.ERR, "FILTER-OIDC--> NO OIDC_CONFIG")
     end
   end
   return oidc_final_config
