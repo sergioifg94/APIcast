@@ -190,15 +190,14 @@ function _M.filter_oidc_config(services, oidc)
   -- If the oidc config comes from remote_v2, will have the service_id, if not
   -- the config should be skipped to make sure that we don't break anything
   for _,oidc_config in ipairs(oidc or {}) do
+    ngx.log(ngx.ERR, "OIDC_CONFIG-->", require("inspect").inspect(oidc_config))
     if oidc_config then
       if not oidc_config.service_id or services_ids[tostring(oidc_config.service_id)] then
         table.insert(oidc_final_config, oidc_config)
-      else
-        -- ngx.log(ngx.ERR, "FILTER-OIDC--->SKIP")
       end
     else
-      table.insert(oidc_final_config, nil)
-      -- ngx.log(ngx.ERR, "FILTER-OIDC--> NO OIDC_CONFIG")
+      print("Insert nill here")
+      table.insert(oidc_final_config, {})
     end
   end
   return oidc_final_config
