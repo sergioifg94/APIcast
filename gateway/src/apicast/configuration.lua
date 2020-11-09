@@ -201,6 +201,11 @@ function _M.new(configuration)
   local services = (configuration or {}).services or {}
   local final_services = _M.filter_services(map(_M.parse_service, services))
 
+  ngx.log(ngx.ERR, "Services-->", require("inspect").inspect(#services))
+  ngx.log(ngx.ERR, "FINAL_SERVICES-->", require("inspect").inspect(#final_services))
+  ngx.log(ngx.ERR, "CONFIG_OIDC-->", require("inspect").inspect(#(configuration.oidc or {})))
+  ngx.log(ngx.ERR, "FINAL_OIDC-->", require("inspect").inspect(#_M.filter_oidc_config(final_services, configuration.oidc or {})))
+
   return setmetatable({
     version = configuration.timestamp,
     services = final_services,
