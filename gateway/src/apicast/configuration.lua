@@ -177,8 +177,8 @@ function _M.filter_services(services, subset)
 end
 
 function _M.filter_oidc_config(services, oidc)
-  ngx.log(ngx.ERR, "FILTER-OIDC Number services", #(services or {}))
-  ngx.log(ngx.ERR, "FILTER-OIDC Number oidc", #(oidc or {}))
+  -- ngx.log(ngx.ERR, "FILTER-OIDC Number services", #(services or {}))
+  -- ngx.log(ngx.ERR, "FILTER-OIDC Number oidc", #(oidc or {}))
 
   local services_ids = {}
   for _,service in ipairs(services or {}) do
@@ -194,10 +194,11 @@ function _M.filter_oidc_config(services, oidc)
       if not oidc_config.service_id or services_ids[tostring(oidc_config.service_id)] then
         table.insert(oidc_final_config, oidc_config)
       else
-        ngx.log(ngx.ERR, "FILTER-OIDC--->SKIP")
+        -- ngx.log(ngx.ERR, "FILTER-OIDC--->SKIP")
       end
     else
-      ngx.log(ngx.ERR, "FILTER-OIDC--> NO OIDC_CONFIG")
+      table.insert(oidc_final_config, nil)
+      -- ngx.log(ngx.ERR, "FILTER-OIDC--> NO OIDC_CONFIG")
     end
   end
   return oidc_final_config
@@ -208,10 +209,10 @@ function _M.new(configuration)
   local services = (configuration or {}).services or {}
   local final_services = _M.filter_services(map(_M.parse_service, services))
 
-  ngx.log(ngx.ERR, "Services-->", require("inspect").inspect(#services))
-  ngx.log(ngx.ERR, "FINAL_SERVICES-->", require("inspect").inspect(#final_services))
-  ngx.log(ngx.ERR, "CONFIG_OIDC-->", require("inspect").inspect(#(configuration.oidc or {})))
-  ngx.log(ngx.ERR, "FINAL_OIDC-->", require("inspect").inspect(#_M.filter_oidc_config(final_services, configuration.oidc or {})))
+  -- ngx.log(ngx.ERR, "Services-->", require("inspect").inspect(#services))
+  -- ngx.log(ngx.ERR, "FINAL_SERVICES-->", require("inspect").inspect(#final_services))
+  -- ngx.log(ngx.ERR, "CONFIG_OIDC-->", require("inspect").inspect(#(configuration.oidc or {})))
+  -- ngx.log(ngx.ERR, "FINAL_OIDC-->", require("inspect").inspect(#_M.filter_oidc_config(final_services, configuration.oidc or {})))
 
   return setmetatable({
     version = configuration.timestamp,
