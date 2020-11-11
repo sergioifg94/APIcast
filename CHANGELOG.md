@@ -32,6 +32,8 @@ to function correctly. [PR #1231](https://github.com/3scale/APIcast/pull/1231)
 - Non-alphanumeric metric name in 3scale-batcher policy [PR #1234](https://github.com/3scale/APIcast/pull/1234) [THREESCALE-4913](https://issues.redhat.com/browse/THREESCALE-4913)
 - Fixed issues when using fully qualified DNS query [PR #1235](https://github.com/3scale/APIcast/pull/1235) [THREESCALE-4752](https://issues.redhat.com/browse/THREESCALE-4752)
 - Fixed issues with OIDC validation [PR #1239](https://github.com/3scale/APIcast/pull/1239) [THREESCALE-6313](https://issues.redhat.com/browse/THREESCALE-6313)
+- Fixed issues with Liquid body size [PR #1240](https://github.com/3scale/APIcast/pull/1240) [THREESCALE-6315](https://issues.redhat.com/browse/THREESCALE-6315)
+
 
 
 
