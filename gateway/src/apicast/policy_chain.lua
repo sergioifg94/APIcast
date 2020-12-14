@@ -195,11 +195,18 @@ end
 
 local function call_chain(phase_name)
     return function(self, context)
+
+        local begin = ngx.now()
+        if not context.metric  then
+          context.metric = {}
+        end
+
         for i=1, #self do
             ngx.log(ngx.DEBUG, 'policy chain execute phase: ', phase_name, ', policy: ', self[i]._NAME, ', i: ', i)
             self[i][phase_name](self[i], context)
         end
-
+        local final = ngx.now() - begin
+        context.metric[phase_name] = final
         return ipairs(self)
     end
 end

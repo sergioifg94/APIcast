@@ -90,6 +90,12 @@ local response_times = prometheus(
   { 'service_id', 'service_system_name' }
 )
 
+local phase_times = prometheus(
+  'histogram',
+  'phase_times',
+  'Phase  times',
+  {'phase'}
+)
 function _M.init_worker()
     metrics_updater.inc(worker_process_metric)
 end
@@ -158,6 +164,11 @@ function _M.log(_, context)
   upstream_metrics.report(ngx.var.upstream_status, ngx.var.upstream_response_time, service)
   report_req_response_time(service)
   metrics_updater.inc(apicast_status_metric, status_map[ngx.status])
+
+  for key,val in pairs(context.metric) do
+    phase_times:observe(val, {key})
+  end
+
 end
 
 return _M
