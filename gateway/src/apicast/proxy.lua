@@ -310,6 +310,8 @@ local function response_codes_data(status)
 end
 
 local function post_action(self, context, cached_key, service, credentials, formatted_usage, response_status_code)
+
+  local start = ngx.now()
   local backend = build_backend_client(self, service)
   local res = backend:authrep(
           formatted_usage,
@@ -317,7 +319,7 @@ local function post_action(self, context, cached_key, service, credentials, form
           response_codes_data(response_status_code),
           self.extra_params_backend_authrep
   )
-
+  context.metric["POST-AUTHREP"] = ngx.now() - start
   self:handle_backend_response(context, cached_key, res)
 end
 
