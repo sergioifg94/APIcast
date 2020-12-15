@@ -138,9 +138,10 @@ function _M:authorize(context, service, usage, credentials, ttl)
     -- set cached_key to nil to avoid doing the authrep in post_action
     ngx.var.cached_key = nil
 
+    local start = ngx.now()
     local backend = build_backend_client(self, service)
     local res = backend:authrep(formatted_usage, credentials, self.extra_params_backend_authrep)
-
+    ngx.log(ngx.ERR, "ACCESS-AUTHREP:", ngx.now() - start)
     local authorized, rejection_reason, retry_after = self:handle_backend_response(
       context, cached_key, res, ttl
     )
@@ -319,6 +320,7 @@ local function post_action(self, context, cached_key, service, credentials, form
           response_codes_data(response_status_code),
           self.extra_params_backend_authrep
   )
+  ngx.log(ngx.ERR, "POST-AUTHREP:", ngx.now() - start)
   context.metric["POST-AUTHREP"] = ngx.now() - start
   self:handle_backend_response(context, cached_key, res)
 end
