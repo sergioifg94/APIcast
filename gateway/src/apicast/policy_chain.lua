@@ -202,8 +202,14 @@ local function call_chain(phase_name)
         end
 
         for i=1, #self do
+            local start = ngx.now()
             ngx.log(ngx.DEBUG, 'policy chain execute phase: ', phase_name, ', policy: ', self[i]._NAME, ', i: ', i)
             self[i][phase_name](self[i], context)
+
+            if phase_name == "post_action" then
+              local final = ngx.now() - start
+              context.metric[string.format("%s_%s", phase_name, self[i]._NAME)] = final
+            end
         end
         local final = ngx.now() - begin
         context.metric[phase_name] = final
