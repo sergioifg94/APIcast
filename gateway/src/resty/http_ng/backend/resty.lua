@@ -9,12 +9,15 @@ local http_proxy = require 'resty.http.proxy'
 
 local function send(httpc, params)
   params.path = params.path or params.uri.path
-
+  local start = ngx.now()
+  -- ngx.log(ngx.ERR, require("inspect").inspect(httpc))
   local res, err = httpc:request(params)
+  ngx.log(ngx.ERR, "REQ time:", ngx.now() - start)
   if not res then return nil, err end
 
+  local start = ngx.now()
   res.body, err = res:read_body()
-
+  ngx.log(ngx.ERR, "REQ BODY read:", ngx.now() - start)
   if not res.body then
     return nil, err
   end
