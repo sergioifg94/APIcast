@@ -48,7 +48,7 @@ server {
 }
 
 server {
-
+  aio threads;
   set $access_logs_enabled '1';
   access_log {{ access_log_file | default: "/dev/stdout" }} time if=$access_logs_enabled;
   set $extended_access_logs_enabled '0';
@@ -60,7 +60,7 @@ server {
   {%- assign https_proxy_protocol = env.APICAST_HTTPS_PROXY_PROTOCOL %}
 
   {% if http_port != https_port -%}
-    listen {{ http_port }} {% if http_proxy_protocol %}proxy_protocol {% endif %};
+    listen {{ http_port }} {% if http_proxy_protocol %}proxy_protocol {% endif %} reuseport;
   {% endif %}
 
   {% if https_port -%}
