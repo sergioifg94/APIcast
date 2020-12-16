@@ -34,10 +34,11 @@ events {
 
 http {
   sendfile           on;
+  sendfile_max_chunk 512k;
   tcp_nopush         on;
   tcp_nodelay        on;
   server_tokens off;
-
+  aio threads;
 
 
   proxy_cache_path /tmp/cache levels=1:2 keys_zone=apicast_cache:10m;
