@@ -48,7 +48,7 @@ server {
 }
 
 server {
-  aio threads;
+  aio on;
   set $access_logs_enabled '1';
   access_log {{ access_log_file | default: "/dev/stdout" }} time if=$access_logs_enabled;
   set $extended_access_logs_enabled '0';
