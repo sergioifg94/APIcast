@@ -46,7 +46,7 @@
         }
       },
       "allow_origin": {
-        "description": "Origin allowed for CORS requests. The field expects only one origin (e.g. https://example.com) or '*'. If left blank, the value of the 'Origin' request header will be used.",
+        "description": "Origin allowed for CORS requests. The field expects only one origin (e.g. https://example.com) or '*'. If left blank, the value of the 'Origin' request header will be used. In case of valid regexp, and if it matches with Origin header value, the value will be set to the Origin Value. In case of does not match, the header will not set at all.",
         "type": "string"
       },
       "allow_credentials": {

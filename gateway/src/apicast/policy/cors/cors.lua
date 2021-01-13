@@ -18,6 +18,8 @@ local _M = policy.new('CORS Policy', 'builtin')
 
 local new = _M.new
 
+local url_helper = require('resty.url_helper')
+
 --- Initialize a CORS policy
 -- @tparam[opt] table config
 -- @field[opt] allow_headers Table with the allowed headers (e.g. Content-Type)
@@ -25,8 +27,19 @@ local new = _M.new
 -- @field[opt] allow_origin Allowed origins (e.g. 'http://example.com', '*')
 -- @field[opt] allow_credentials Boolean
 function _M.new(config)
-  local self = new(config)
-  self.config = config or {}
+  local  cfg = config or {}
+  local self = new(cfg)
+  self.allow_origin_is_regexp = false
+
+  local _, err = url_helper.parse_url(cfg.allow_origin or "")
+  if err then
+    if cfg.allow_origin ~= "*" and cfg.allow_origin then
+      self.allow_origin_is_regexp = true
+    end
+
+  end
+
+  self.config = cfg
   return self
 end
 
@@ -40,8 +53,18 @@ local function set_access_control_allow_methods(allow_methods)
   ngx.header['Access-Control-Allow-Methods'] = value
 end
 
-local function set_access_control_allow_origin(allow_origin, default)
-  ngx.header['Access-Control-Allow-Origin'] = allow_origin or default
+local function set_access_control_allow_origin(self, allow_origin, default)
+  if not self.allow_origin_is_regexp then
+    ngx.header['Access-Control-Allow-Origin'] = allow_origin or default
+    return
+  end
+
+  local m = ngx.re.match(default, allow_origin)
+  if m then
+    ngx.header['Access-Control-Allow-Origin'] = default
+    return
+  end
+  ngx.log(ngx.DEBUG, "Default Origin header did not match, skip Access-Control-Allow-Origin header")
 end
 
 local function set_access_control_allow_credentials(allow_credentials)
@@ -56,13 +79,13 @@ local function set_access_control_max_age(max_age)
   ngx.header['Access-Control-Max-Age'] = value
 end
 
-local function set_cors_headers(config)
+local function set_cors_headers(self, config)
   local origin = ngx.var.http_origin
   if not origin then return end
 
   set_access_control_allow_headers(config.allow_headers)
   set_access_control_allow_methods(config.allow_methods)
-  set_access_control_allow_origin(config.allow_origin, origin)
+  set_access_control_allow_origin(self, config.allow_origin, origin)
   set_access_control_allow_credentials(config.allow_credentials)
   set_access_control_max_age(config.max_age)
 end
@@ -86,7 +109,7 @@ function _M.rewrite(_)
 end
 
 function _M:header_filter()
-  set_cors_headers(self.config)
+  set_cors_headers(self, self.config)
 end
 
 return _M
