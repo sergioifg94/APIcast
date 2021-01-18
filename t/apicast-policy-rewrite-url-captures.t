@@ -19,7 +19,8 @@ __DATA__
               "transformations": [
                 {
                   "match_rule": "/{var_1}/{var_2}",
-                  "template": "/{var_2}?my_arg={var_1}"
+                  "template": "/{var_2}?my_arg={var_1}",
+                  "methods": ["GET"]
                 }
               ]
             }
@@ -56,6 +57,8 @@ yay, api backend
 --- error_code: 200
 --- no_error_log
 [error]
+
+
 
 === TEST 2: several transformations that match
 When there are several transformations that match, only the first one is applied.
@@ -228,6 +231,56 @@ yay, api backend
   }
 --- request
 GET /abc/def?user_key=value
+--- response_body
+yay, api backend
+--- error_code: 200
+--- no_error_log
+[error]
+
+=== TEST 5: one transformation with method that matches
+--- configuration
+{
+  "services": [
+    {
+      "id": 42,
+      "proxy": {
+        "policy_chain": [
+          {
+            "name": "rewrite_url_captures",
+            "configuration": {
+              "transformations": [
+                {
+                  "match_rule": "/{var_1}/{var_2}",
+                  "template": "/{var_2}?my_arg={var_1}",
+                  "methods": ["PUT", "OPTIONS"]
+                }
+              ]
+            }
+          },
+          {
+            "name": "upstream",
+            "configuration": {
+              "rules": [
+                {
+                  "regex": "/",
+                  "url": "http://test:$TEST_NGINX_SERVER_PORT"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+--- upstream
+  location / {
+     content_by_lua_block {
+       ngx.say('yay, api backend')
+     }
+  }
+--- request
+PUT /abc/def?user_key=value
 --- response_body
 yay, api backend
 --- error_code: 200

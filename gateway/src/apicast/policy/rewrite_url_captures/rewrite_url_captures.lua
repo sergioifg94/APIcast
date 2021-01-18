@@ -27,7 +27,8 @@ function _M.new(config)
   for _, transformation in ipairs(config.transformations or {}) do
     local matcher = NamedArgsMatcher.new(
       transformation.match_rule,
-      transformation.template
+      transformation.template,
+      transformation.methods
     )
 
     insert(self.matchers, matcher)
@@ -56,7 +57,7 @@ end
 -- Defining rules that take into account previous matches can become quite
 -- complex and I don't think it's a common use case. Notice that it's possible
 -- to do that anyway by chaining multiple instances of this policy.
-function _M:rewrite()
+function _M:rewrite(context)
   local uri = ngx.var.uri
 
   for _, matcher in ipairs(self.matchers) do
