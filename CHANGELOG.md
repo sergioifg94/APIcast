@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed Status code overwrite policy jsonschema [PR #1296](https://github.com/3scale/APIcast/pull/1296) [THREESCALE-6415](https://issues.redhat.com/browse/THREESCALE-6415)
 - Fixed URL encoding on set-path [PR #1297](https://github.com/3scale/APIcast/pull/1297) [THREESCALE-5117](https://issues.redhat.com/browse/THREESCALE-5117)
 - Fixed trailing slash on routing policy [PR #1298](https://github.com/3scale/APIcast/pull/1298) [THREESCALE-7146](https://issues.redhat.com/browse/THREESCALE-7146)
+- Fixed race condition on caching mode [PR #1259](https://github.com/3scale/APIcast/pull/1259) [THREESCALE-4464](https://issues.redhat.com/browse/THREESCALE-4464)
 
 
 ### Added
