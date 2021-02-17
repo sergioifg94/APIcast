@@ -35,7 +35,7 @@ function request.extract_headers(req)
 
   headers.user_agent = headers.user_agent or 'APIcast (+https://www.apicast.io)'
   headers.host = headers.host or extract_host(req.url)
-  headers.connection = headers.connection or 'Keep-Alive'
+  headers.connection = 'close'
 
   options.headers = nil
 
