@@ -12,7 +12,7 @@ NPROC ?= $(firstword $(shell nproc 2>/dev/null) 1)
 SEPARATOR="\n=============================================\n"
 
 IMAGE_NAME ?= apicast-test
-OPENRESTY_VERSION ?= master
+OPENRESTY_VERSION ?= perf
 BUILDER_IMAGE ?= quay.io/3scale/s2i-openresty-centos7:$(OPENRESTY_VERSION)
 RUNTIME_IMAGE ?= $(BUILDER_IMAGE)-runtime
 
