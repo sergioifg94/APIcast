@@ -84,9 +84,39 @@ local function current_path(uri)
     return format('%s%s%s', uri.path or ngx.var.uri, ngx.var.is_args, ngx.var.query_string or '')
 end
 
+local function sock_reader(sock)
+  if sock == nil then
+    return nil, err
+  end
+
+  return co_wrap_iter(function()
+    while true do
+      local chunk, err, partial = sock:receive(chunk_size)
+      if err == "closed" and partial then
+        co_yield(partial)
+      end
+
+      if not chunk then
+        break
+      end
+
+      co_yield(chunk)
+    end
+  end)
+end
+
 local function forward_https_request(proxy_uri, uri, skip_https_connect)
     -- This is needed to call ngx.req.get_body_data() below.
-    ngx.req.read_body()
+    -- ngx.req.read_body()
+
+    local req_socket = ngx.req.socket
+    local tcpsock, err = req_socket()
+    -- tcpsock:settimeout(150000)  -- one second timeout
+    local body, err = sock_reader(tcpsock)
+    if err then
+      ngx.log(ngx.ERR, "cannot read body", err)
+      return
+    end
 
     local request = {
         uri = uri,
@@ -103,23 +133,23 @@ local function forward_https_request(proxy_uri, uri, skip_https_connect)
         -- read and need to be cached in a local file. This request will return
         -- nil, so after this we need to read the temp file.
         -- https://github.com/openresty/lua-nginx-module#ngxreqget_body_data
-        body = ngx.req.get_body_data(),
+        body = body,
         proxy_uri = proxy_uri
     }
 
-    if not request.body then
-        local temp_file_path = ngx.req.get_body_file()
-        ngx.log(ngx.INFO, "HTTPS Proxy: Request body is bigger than client_body_buffer_size, read the content from path='", temp_file_path, "'")
+    -- if not request.body then
+    --     local temp_file_path = ngx.req.get_body_file()
+    --     ngx.log(ngx.INFO, "HTTPS Proxy: Request body is bigger than client_body_buffer_size, read the content from path='", temp_file_path, "'")
 
-        if temp_file_path then
-          local body, err = file_reader(temp_file_path)
-          if err then
-            ngx.log(ngx.ERR, "HTTPS proxy: Failed to read temp body file, err: ", err)
-            ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
-          end
-          request.body = body
-        end
-    end
+    --     if temp_file_path then
+    --       local body, err = file_reader(temp_file_path)
+    --       if err then
+    --         ngx.log(ngx.ERR, "HTTPS proxy: Failed to read temp body file, err: ", err)
+    --         ngx.exit(ngx.HTTP_INTERNAL_SERVER_ERROR)
+    --       end
+    --       request.body = body
+    --     end
+    -- end
 
     local httpc, err = http_proxy.new(request, skip_https_connect)
 
