@@ -133,7 +133,7 @@ local function forward_https_request(proxy_uri, uri, skip_https_connect)
         -- read and need to be cached in a local file. This request will return
         -- nil, so after this we need to read the temp file.
         -- https://github.com/openresty/lua-nginx-module#ngxreqget_body_data
-        body = body,
+        body = "fooo==123",
         proxy_uri = proxy_uri
     }
 
