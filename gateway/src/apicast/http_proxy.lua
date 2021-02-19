@@ -93,6 +93,7 @@ local function sock_reader(sock)
     while true do
       local chunk, err, partial = sock:receive(chunk_size)
       if err == "closed" and partial then
+        ngx.log(ngx.ERR, "PARTIAL::", partial)
         co_yield(partial)
       end
 
@@ -100,6 +101,7 @@ local function sock_reader(sock)
         break
       end
 
+      ngx.log(ngx.ERR, "CHUNK::", chunk)
       co_yield(chunk)
     end
   end)
@@ -133,7 +135,7 @@ local function forward_https_request(proxy_uri, uri, skip_https_connect)
         -- read and need to be cached in a local file. This request will return
         -- nil, so after this we need to read the temp file.
         -- https://github.com/openresty/lua-nginx-module#ngxreqget_body_data
-        body = "fooo==123",
+        body = body,
         proxy_uri = proxy_uri
     }
 
