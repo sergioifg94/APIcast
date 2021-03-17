@@ -73,10 +73,10 @@ function _M.new(oidc_config)
       -- principal that is the subject of the JWT.
       sub = jwt_validators.required(),
 
-      -- 3. The JWT MUST contain an "aud" (audience) claim containing a
-      -- value that identifies the authorization server as an intended
-      -- audience.
-      aud = jwt_validators.required(),
+      -- -- 3. The JWT MUST contain an "aud" (audience) claim containing a
+      -- -- value that identifies the authorization server as an intended
+      -- -- audience.
+      -- aud = jwt_validators.required(),
 
       -- 4. The JWT MUST contain an "exp" (expiration time) claim that
       -- limits the time window during which the JWT can be used.
