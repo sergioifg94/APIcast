@@ -138,20 +138,20 @@ function _M:authorize(context, service, usage, credentials, ttl)
     -- set cached_key to nil to avoid doing the authrep in post_action
     ngx.var.cached_key = nil
 
-    local backend = build_backend_client(self, service)
-    local res = backend:authrep(formatted_usage, credentials, self.extra_params_backend_authrep)
+    -- local backend = build_backend_client(self, service)
+    -- local res = backend:authrep(formatted_usage, credentials, self.extra_params_backend_authrep)
 
-    local authorized, rejection_reason, retry_after = self:handle_backend_response(
-      context, cached_key, res, ttl
-    )
+    -- local authorized, rejection_reason, retry_after = self:handle_backend_response(
+    --   context, cached_key, res, ttl
+    -- )
 
-    if not authorized then
-      if rejection_reason == 'limits_exceeded' then
-        return errors.limits_exceeded(service, retry_after)
-      else -- Generic error for now. Maybe return different ones in the future.
-        return errors.authorization_failed(service)
-      end
-    end
+    -- if not authorized then
+    --   if rejection_reason == 'limits_exceeded' then
+    --     return errors.limits_exceeded(service, retry_after)
+    --   else -- Generic error for now. Maybe return different ones in the future.
+    --     return errors.authorization_failed(service)
+    --   end
+    -- end
   end
 end
 
