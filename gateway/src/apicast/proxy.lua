@@ -118,41 +118,41 @@ function _M:authorize(context, service, usage, credentials, ttl)
 
   output_debug_headers(service, encoded_usage, encoded_credentials)
 
-  -- NYI: return to lower frame
-  local cached_key = ngx.var.cached_key .. ":" .. encoded_usage
+  -- -- NYI: return to lower frame
+  -- local cached_key = ngx.var.cached_key .. ":" .. encoded_usage
 
-  local encoded_extra_params = encode_args(self.extra_params_backend_authrep)
-  if encoded_extra_params ~= '' then
-    cached_key = cached_key .. ":" .. encoded_extra_params
-  end
+  -- local encoded_extra_params = encode_args(self.extra_params_backend_authrep)
+  -- if encoded_extra_params ~= '' then
+  --   cached_key = cached_key .. ":" .. encoded_extra_params
+  -- end
 
-  local cache = self.cache
-  local is_known = cache:get(cached_key)
+  -- local cache = self.cache
+  -- local is_known = cache:get(cached_key)
 
-  if is_known == 200 then
-    ngx.log(ngx.DEBUG, 'apicast cache hit key: ', cached_key)
-    ngx.var.cached_key = cached_key
-  else
-    ngx.log(ngx.INFO, 'apicast cache miss key: ', cached_key, ' value: ', is_known)
+  -- if is_known == 200 then
+  --   ngx.log(ngx.DEBUG, 'apicast cache hit key: ', cached_key)
+  --   ngx.var.cached_key = cached_key
+  -- else
+  --   ngx.log(ngx.INFO, 'apicast cache miss key: ', cached_key, ' value: ', is_known)
 
-    -- set cached_key to nil to avoid doing the authrep in post_action
-    ngx.var.cached_key = nil
+  --   -- set cached_key to nil to avoid doing the authrep in post_action
+  --   ngx.var.cached_key = nil
 
-    -- local backend = build_backend_client(self, service)
-    -- local res = backend:authrep(formatted_usage, credentials, self.extra_params_backend_authrep)
+  --   -- local backend = build_backend_client(self, service)
+  --   -- local res = backend:authrep(formatted_usage, credentials, self.extra_params_backend_authrep)
 
-    -- local authorized, rejection_reason, retry_after = self:handle_backend_response(
-    --   context, cached_key, res, ttl
-    -- )
+  --   -- local authorized, rejection_reason, retry_after = self:handle_backend_response(
+  --   --   context, cached_key, res, ttl
+  --   -- )
 
-    -- if not authorized then
-    --   if rejection_reason == 'limits_exceeded' then
-    --     return errors.limits_exceeded(service, retry_after)
-    --   else -- Generic error for now. Maybe return different ones in the future.
-    --     return errors.authorization_failed(service)
-    --   end
-    -- end
-  end
+  --   -- if not authorized then
+  --   --   if rejection_reason == 'limits_exceeded' then
+  --   --     return errors.limits_exceeded(service, retry_after)
+  --   --   else -- Generic error for now. Maybe return different ones in the future.
+  --   --     return errors.authorization_failed(service)
+  --   --   end
+  --   -- end
+  -- end
 end
 
 function _M.set_service(service)
@@ -337,7 +337,7 @@ function _M:post_action(context)
   local credentials = context.credentials
   local formatted_usage = context.usage:format()
 
-  reporting_executor:post(post_action, self, context, cached_key, service, credentials, formatted_usage, ngx.var.status)
+  -- reporting_executor:post(post_action, self, context, cached_key, service, credentials, formatted_usage, ngx.var.status)
 end
 
 -- Returns the rejection reason from the headers of a 3scale backend response.
