@@ -8,6 +8,7 @@ local response = require 'resty.http_ng.response'
 local http_proxy = require 'resty.http.proxy'
 
 local function send(httpc, params)
+  ngx.log(ngx.ERR, "SEND ON HERE")
   params.path = params.path or params.uri.path
 
   local res, err = httpc:request(params)
