@@ -115,10 +115,10 @@ function _M:content(context)
 
   local upstream = assert(context[self].upstream, 'missing upstream')
 
-  -- if upstream then
-  --   ngx.log(ngx.ERR, require("inspect").inspect(upstream))
-  --   upstream:call(context)
-  -- end
+  if upstream then
+    -- ngx.log(ngx.ERR, require("inspect").inspect(upstream))
+    upstream:call(context)
+  end
 end
 
 function _M:export()
