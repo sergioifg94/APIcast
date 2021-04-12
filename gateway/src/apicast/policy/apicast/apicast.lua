@@ -73,18 +73,18 @@ function _M:rewrite(context)
   ngx.ctx.proxy = p
 end
 
--- function _M:post_action(context)
---   if not (context[self] and context[self].run_post_action) then return end
+function _M:post_action(context)
+  if not (context[self] and context[self].run_post_action) then return end
 
---   local p = context and context.proxy or ngx.ctx.proxy or self.proxy
+  local p = context and context.proxy or ngx.ctx.proxy or self.proxy
 
---   if p then
---     return p:post_action(context)
---   else
---     ngx.log(ngx.ERR, 'could not find proxy for request')
---     return nil, 'no proxy for request'
---   end
--- end
+  if p then
+    return p:post_action(context)
+  else
+    ngx.log(ngx.ERR, 'could not find proxy for request')
+    return nil, 'no proxy for request'
+  end
+end
 
 function _M:access(context)
   if context.skip_apicast_access then return end
