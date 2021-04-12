@@ -86,39 +86,39 @@ end
 --   end
 -- end
 
--- function _M:access(context)
---   if context.skip_apicast_access then return end
+function _M:access(context)
+  if context.skip_apicast_access then return end
 
---   -- Flag to run post_action() only when access() was executed.
---   -- Other policies can call ngx.exit(4xx) on access() or rewrite. If they're
---   -- placed before APIcast in the chain, the request will be denied and this
---   -- access() phase will no be run. However, ngx.exit(4xx) skips some phases,
---   -- but not post_action. Post_action would run if we did not set this flag,
---   -- and we want to avoid that. Otherwise, post_action could call authrep()
---   -- even when another policy denied the request.
---   context[self] = context[self] or {}
---   context[self].run_post_action = true
+  -- Flag to run post_action() only when access() was executed.
+  -- Other policies can call ngx.exit(4xx) on access() or rewrite. If they're
+  -- placed before APIcast in the chain, the request will be denied and this
+  -- access() phase will no be run. However, ngx.exit(4xx) skips some phases,
+  -- but not post_action. Post_action would run if we did not set this flag,
+  -- and we want to avoid that. Otherwise, post_action could call authrep()
+  -- even when another policy denied the request.
+  context[self] = context[self] or {}
+  context[self].run_post_action = true
 
---   local ctx = ngx.ctx
---   local p = context and context.proxy or ctx.proxy or self.proxy
+  local ctx = ngx.ctx
+  local p = context and context.proxy or ctx.proxy or self.proxy
 
---   if p then
---     return p:access(context, context.service, context.usage, context.credentials, context.ttl)
---   end
--- end
+  if p then
+    return p:access(context, context.service, context.usage, context.credentials, context.ttl)
+  end
+end
 
--- function _M:content(context)
---   if not context[self].upstream then
---     ngx.log(ngx.WARN, "Upstream server not found for this request")
---     return errors.upstream_not_found(context.service)
---   end
+function _M:content(context)
+  if not context[self].upstream then
+    ngx.log(ngx.WARN, "Upstream server not found for this request")
+    return errors.upstream_not_found(context.service)
+  end
 
---   local upstream = assert(context[self].upstream, 'missing upstream')
+  local upstream = assert(context[self].upstream, 'missing upstream')
 
---   if upstream then
---     upstream:call(context)
---   end
--- end
+  if upstream then
+    upstream:call(context)
+  end
+end
 
 function _M:export()
     return {
