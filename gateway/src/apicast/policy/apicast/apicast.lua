@@ -107,18 +107,19 @@ function _M:access(context)
   end
 end
 
--- function _M:content(context)
---   if not context[self].upstream then
---     ngx.log(ngx.WARN, "Upstream server not found for this request")
---     return errors.upstream_not_found(context.service)
---   end
+function _M:content(context)
+  if not context[self].upstream then
+    ngx.log(ngx.WARN, "Upstream server not found for this request")
+    return errors.upstream_not_found(context.service)
+  end
 
---   local upstream = assert(context[self].upstream, 'missing upstream')
+  local upstream = assert(context[self].upstream, 'missing upstream')
 
---   if upstream then
---     upstream:call(context)
---   end
--- end
+  -- if upstream then
+  --   ngx.log(ngx.ERR, require("inspect").inspect(upstream))
+  --   upstream:call(context)
+  -- end
+end
 
 function _M:export()
     return {
