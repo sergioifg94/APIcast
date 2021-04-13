@@ -14,7 +14,7 @@ local _M = {
 
 local mt = { __index = _M }
 
-local shared_lrucache = resty_lrucache.new(1000)
+local shared_lrucache = resty_lrucache.new(1)
 
 function _M.shared()
   return _M.new(shared_lrucache)
