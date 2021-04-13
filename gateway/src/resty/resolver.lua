@@ -366,6 +366,7 @@ function _M.lookup(self, qname, stale)
 end
 
 function _M.get_servers(self, qname, opts)
+
   opts = opts or {}
   local dns = self.dns
 
@@ -379,16 +380,17 @@ function _M.get_servers(self, qname, opts)
 
   -- TODO: pass proper options to dns resolver (like SRV query type)
 
-  local sema, key = synchronization:acquire(format('qname:%s:qtype:%s', qname, 'A'))
-  local ok = sema:wait(0)
-
+  -- local sema, key = synchronization:acquire(format('qname:%s:qtype:%s', qname, 'A'))
+  -- local ok = sema:wait(0)
   local answers, err = self:lookup(qname, not ok)
 
-  if ok then
-    -- cleanup the key so we don't have unbounded growth of this table
-    synchronization:release(key)
-    sema:post()
-  end
+  -- if ok then
+
+  --   -- ngx.log(ngx.ERR, "RELEASE" )
+  --   -- cleanup the key so we don't have unbounded growth of this table
+  --   synchronization:release(key)
+  --   sema:post()
+  -- end
 
   if err then
     ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with error: ', err)
