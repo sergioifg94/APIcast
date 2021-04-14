@@ -170,13 +170,12 @@ end
 
 local function exec(self)
   -- ngx.log(ngx.ERR, "HERE")
-    return
-    -- ngx.var.proxy_pass = proxy_pass(self)
+    ngx.var.proxy_pass = proxy_pass(self)
 
-    -- -- the caller can unset the location_name to do own exec/location.capture
-    -- if self.location_name then
-    --     ngx.exec(self.location_name)
-    -- end
+    -- the caller can unset the location_name to do own exec/location.capture
+    if self.location_name then
+        ngx.exec(self.location_name)
+    end
 end
 
 function _M:set_host_header()
