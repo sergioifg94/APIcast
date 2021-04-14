@@ -418,7 +418,7 @@ function _M.get_servers(self, qname, opts)
 
   -- local sema, key = synchronization:acquire(format('qname:%s:qtype:%s', qname, 'A'))
   -- local ok = sema:wait(0)
-  local answers, err = self:lookup(qname, not ok)
+  -- local answers, err = self:lookup(qname, not ok)
 
   -- if ok then
 
@@ -428,18 +428,28 @@ function _M.get_servers(self, qname, opts)
   --   sema:post()
   -- end
 
-  if err then
-    ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with error: ', err)
-    return {}, err
-  end
+  -- if err then
+  --   ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with error: ', err)
+  --   return {}, err
+  -- end
 
-  if not answers then
-    ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with no answers')
-    return {}, 'no answers'
-  end
+  -- if not answers then
+  --   ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with no answers')
+  --   return {}, 'no answers'
+  -- end
 
-  ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with ' , #answers, ' answers')
+  -- ngx.log(ngx.DEBUG, 'query for ', qname, ' finished with ' , #answers, ' answers')
 
+
+  -- ngx.log(ngx.ERR, require("inspect").inspect(answers))
+  answers = {{
+    address = "172.30.95.223",
+    class= 1,
+    name=qname,
+    section=1,
+    ttl=10,
+  }}
+  -- ngx.log(ngx.ERR, require("inspect").inspect(answers))
   local servers = convert_answers(answers, opts.port)
 
   servers.query = qname
