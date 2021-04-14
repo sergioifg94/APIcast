@@ -169,7 +169,7 @@ jobs:
           command: make builder-image
 
       - run: |
-          make test-builder-image gateway-logs --keep-going
+          # make test-builder-image gateway-logs --keep-going
           make lint-schema
 
       - login-docker:
