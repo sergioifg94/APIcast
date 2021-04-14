@@ -289,14 +289,14 @@ local function search_dns(self, qname, stale)
 
   local function get_answer(query)
     local answers, err
-    answers, err = cache:get(query, stale)
+    -- answers, err = cache:get(query, stale)
     if valid_answers(answers) then
       return answers, err
     end
 
     answers, err = dns:query(query, options)
     if valid_answers(answers) then
-      cache:save(answers)
+      -- cache:save(answers)
       return answers, err
     end
     return nil, err
@@ -382,27 +382,27 @@ function _M.get_servers(self, qname, opts)
   --------------------------------------------------------------------------
   --------------------------------------------------------------------------
   --------------------------------------------------------------------------
-  local nameserver = "172.30.0.10"
-  local resolver = require "resty.dns.resolver"
-  local r, err = resolver:new{
-      nameservers = { nameserver },
-      retrans = 5,  -- 5 retransmissions on receive timeout
-      timeout = 2000,  -- 2 sec
-      no_random = true, -- always start with first nameserver
-  }
-  ngx.log(ngx.ERR, "---------------------------------")
-  if not r then
-      ngx.log(ngx.ERR, "failed to instantiate the resolver: ", err)
-      return
-  end
+  -- local nameserver = "172.30.0.10"
+  -- local resolver = require "resty.dns.resolver"
+  -- local r, err = resolver:new{
+  --     nameservers = { nameserver },
+  --     retrans = 5,  -- 5 retransmissions on receive timeout
+  --     timeout = 2000,  -- 2 sec
+  --     no_random = true, -- always start with first nameserver
+  -- }
+  -- ngx.log(ngx.ERR, "---------------------------------")
+  -- if not r then
+  --     ngx.log(ngx.ERR, "failed to instantiate the resolver: ", err)
+  --     return
+  -- end
 
-  ngx.log(ngx.ERR, "---------------------------------")
-  local answers, err, tries = r:query(qname, nil, {})
-  if not answers then
-      ngx.log(ngx.ERR, "failed to query the DNS server: ", err)
-      ngx.log(ngx.ERR, "retry historie:\n  ", table.concat(tries, "\n  "))
-      return
-  end
+  -- ngx.log(ngx.ERR, "---------------------------------")
+  -- local answers, err, tries = r:query(qname, nil, {})
+  -- if not answers then
+  --     ngx.log(ngx.ERR, "failed to query the DNS server: ", err)
+  --     ngx.log(ngx.ERR, "retry historie:\n  ", table.concat(tries, "\n  "))
+  --     return
+  -- end
   --------------------------------------------------------------------------
   --------------------------------------------------------------------------
   --------------------------------------------------------------------------
@@ -418,7 +418,7 @@ function _M.get_servers(self, qname, opts)
 
   -- local sema, key = synchronization:acquire(format('qname:%s:qtype:%s', qname, 'A'))
   -- local ok = sema:wait(0)
-  -- local answers, err = self:lookup(qname, not ok)
+  local answers, err = self:lookup(qname, not ok)
 
   -- if ok then
 
@@ -443,7 +443,7 @@ function _M.get_servers(self, qname, opts)
   local servers = convert_answers(answers, opts.port)
 
   servers.query = qname
-  ngx.log(ngx.ERR, require("inspect").inspect(servers))
+  -- ngx.log(ngx.ERR, require("inspect").inspect(servers))
   return servers
 end
 
