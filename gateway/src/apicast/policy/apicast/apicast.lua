@@ -10,6 +10,8 @@ local user_agent = require('apicast.user_agent')
 
 local _M = require('apicast.policy').new('APIcast', 'builtin')
 
+local shared_dict_flush = 120
+
 local mt = {
   __index = _M
 }
@@ -18,6 +20,15 @@ local mt = {
 function _M.new()
   return setmetatable({
   }, mt)
+end
+
+function _M:init_worker()
+   local handler = function()
+    for name,dict in pairs(ngx.shared) do
+      dict:flush_expired()
+    end
+   end
+   ngx.timer.every(shared_dict_flush, handler)
 end
 
 function _M.init()
