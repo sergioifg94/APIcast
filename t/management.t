@@ -2,6 +2,10 @@ use lib 't';
 
 use Test::APIcast 'no_plan';
 
+# Converts what's in the 'expected_json' block and the body to JSON and
+# compares them. Raises and error when they do not match.
+require("policies.pl");
+
 run_tests();
 
 __DATA__
@@ -22,7 +26,7 @@ include $TEST_NGINX_MANAGEMENT_CONFIG;
 GET /status/ready
 --- response_headers
 Content-Type: application/json; charset=utf-8
---- response_body
+--- expected_json
 {"status":"ready","success":true}
 --- error_code: 200
 --- no_error_log
@@ -40,7 +44,7 @@ include $TEST_NGINX_MANAGEMENT_CONFIG;
 GET /status/ready
 --- response_headers
 Content-Type: application/json; charset=utf-8
---- response_body
+--- expected_json
 {"success":false,"status":"error","error":"not configured"}
 --- error_code: 412
 --- no_error_log
@@ -48,6 +52,7 @@ Content-Type: application/json; charset=utf-8
 
 === TEST 3: readiness probe with 0 services
 Should respond with error status and a reason.
+
 --- main_config
 env APICAST_MANAGEMENT_API=status;
 --- http_config
@@ -61,7 +66,7 @@ env APICAST_MANAGEMENT_API=status;
 GET /status/ready
 --- response_headers
 Content-Type: application/json; charset=utf-8
---- response_body
+--- expected_json
 {"success":true,"status":"warning","warning":"no services"}
 --- error_code: 200
 --- no_error_log
@@ -79,7 +84,7 @@ env APICAST_MANAGEMENT_API=status;
 GET /status/live
 --- response_headers
 Content-Type: application/json; charset=utf-8
---- response_body
+--- expected_json
 {"status":"live","success":true}
 --- error_code: 200
 --- no_error_log
@@ -101,7 +106,7 @@ include $TEST_NGINX_MANAGEMENT_CONFIG;
 GET /config
 --- response_headers
 Content-Type: application/json; charset=utf-8
---- response_body
+--- expected_json
 {"services":[{"id":42}]}
 --- error_code: 200
 --- no_error_log
@@ -163,7 +168,7 @@ env APICAST_MANAGEMENT_API=debug;
 include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request
 POST /boot
---- response_body
+--- expected_json
 {"status":"ok","config":{"services":[{"id":42}],"oidc":[false]}}
 --- error_code: 200
 --- udp_listen random_port env chomp
@@ -203,20 +208,17 @@ $TEST_NGINX_RANDOM_PORT
 --- no_error_log
 [error]
 
-
 === TEST 10: config endpoint can delete configuration
 --- main_config
 env APICAST_MANAGEMENT_API=debug;
 --- http_config
   lua_package_path "$TEST_NGINX_LUA_PATH";
 --- config
-
   location = /test {
     echo_subrequest PUT /config -b '{"services":[{"id":42}]}';
     echo_subrequest DELETE /config;
     echo_subrequest GET /config;
   }
-
   include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request
 GET /test
@@ -228,6 +230,7 @@ null
 --- no_error_log
 [error]
 
+
 === TEST 11: all endpoints use correct Content-Type
 JSON response body and content type application/json should be returned.
 --- main_config
@@ -237,7 +240,7 @@ env APICAST_MANAGEMENT_API=debug;
 --- config
   include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request eval
-[ 'DELETE /config', 'PUT /config 
+[ 'DELETE /config', 'PUT /config
 {"services":[{"id":42}]}', 'POST /config
 {"services":[{"id":42}]}', 'GET /config' ]
 --- response_headers eval
@@ -245,7 +248,7 @@ env APICAST_MANAGEMENT_API=debug;
   'Content-Type: application/json; charset=utf-8',
   'Content-Type: application/json; charset=utf-8', 
   'Content-Type: application/json; charset=utf-8' ]
---- response_body eval
+---  expected_json eval
 [ '{"status":"ok","config":null}'."\n",
   '{"services":1,"status":"ok","config":{"services":[{"id":42}]}}'."\n",
   '{"services":1,"status":"ok","config":{"services":[{"id":42}]}}'."\n",
@@ -329,7 +332,7 @@ include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request
 POST /config
 invalid json
---- response_body
+--- expected_json
 {"config":null,"status":"error","error":"Expected value but found invalid token at character 1"}
 --- error_code: 400
 --- no_error_log
@@ -347,7 +350,7 @@ include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request
 POST /config
 {"id":42}
---- response_body
+--- expected_json
 {"services":0,"config":{"id":42},"status":"not_configured"}
 --- error_code: 406
 --- no_error_log
@@ -363,7 +366,7 @@ env APICAST_MANAGEMENT_API=status;
 include $TEST_NGINX_MANAGEMENT_CONFIG;
 --- request
 GET /status/info
---- response_body
+--- expected_json
 {"timers":{"running":0,"pending":0},"worker":{"exiting":false,"count":1,"id":0}}
 --- error_code: 200
 --- no_error_log
