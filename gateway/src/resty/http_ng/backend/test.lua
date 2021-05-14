@@ -14,7 +14,6 @@ local _M = {}
 local function contains(expected, actual)
   if actual == expected then return true end
   local t1,t2 = type(actual), type(expected)
-
   if t1 ~= t2 then
     local mt = getmetatable(actual) or {}
     if t2 == 'string' and mt.__tostring then
@@ -94,7 +93,7 @@ _M.new = function()
     if not expectation then error(missing_expecation(request)) end
     local match, err = _M.expectation.match(expectation, request)
     if not match then error('expectation does not match: ' .. err) end
-
+   
     insert(requests, request)
 
     local res = expectation.response
@@ -104,6 +103,10 @@ _M.new = function()
 
   backend.verify_no_outstanding_expectations = function()
     assert(#expectations == 0, 'has ' .. #expectations .. ' outstanding expectations')
+  end
+
+  backend.get_requests = function()
+    return  requests
   end
 
   return backend

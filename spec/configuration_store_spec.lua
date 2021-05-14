@@ -255,10 +255,18 @@ describe('Configuration Store', function()
 
       local service1 = { id = '42' }
       local service2 = { id = '43' }
+
       store:add(service1)
       store:add(service2)
 
-      assert.same({ service1, service2 }, store:all())
+      -- I'm crying, but I need to do this hack, table-sort return a iterator
+      -- function so cannot compare at all. Didn't find a better way
+      tablex = require "pl.tablex"
+      local sorted_ids = {}
+      for _,v in tablex.sortv(store:all(), function(x,y) return y.id > x.id end) do
+        table.insert(sorted_ids, v)
+      end
+     assert.same({ service1, service2 }, sorted_ids)
     end)
   end)
 
