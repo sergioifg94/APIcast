@@ -191,7 +191,6 @@ __DATA__
 
 === TEST 4: Verify that OIDC is working when filter services.
 Related to issues THREESCALE-6042
---- ONLY
 --- env eval
 (
   "APICAST_SERVICES_LIST", "42"
