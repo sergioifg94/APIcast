@@ -129,15 +129,22 @@ local function parse_resp_body(self, resp_body)
     local original_proxy_config = deepcopy(proxy_config)
 
     local service = configuration.parse_service(proxy_config.content)
+
+    -- We always assign a oidc to the service, even an empty one with the
+    -- service_id, if not on APICAST_SERVICES_LIST will fail on filtering
     local oidc = self:oidc_issuer_configuration(service)
+    if not oidc then
+      oidc = {}
+    end
 
-    -- Assign false instead of nil to avoid sparse arrays. cjson raises an
-    -- error by default when converting sparse arrays.
-    config.oidc[i] = oidc or false
+    -- deepcopy because this can be cached, and we want to have a deepcopy to
+    -- avoid issues with service_id
+    local oidc_copy = deepcopy(oidc)
+    oidc_copy.service_id = service.id
 
+    config.oidc[i] = oidc_copy
     config.services[i] = original_proxy_config.content
   end
-
   return cjson.encode(config)
 end
 
