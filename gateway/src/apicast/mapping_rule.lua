@@ -13,6 +13,8 @@ local re_match = ngx.re.match
 local insert = table.insert
 local re_gsub = ngx.re.gsub
 
+local rest_rule = require('threescalers.rest_rule')
+
 -- This is introduced by API as a product feature. There are two kinds of
 -- mapping rules owner: `BackendAPI` that means that is used by API as a
 -- product and `Proxy` that means that it's a normal mapping rule.
@@ -32,6 +34,19 @@ local function hash_to_array(hash)
   end
 
   return array
+end
+
+local function hash_to_query_string(hash)
+  local qs = ''
+
+  for k,v in pairs(hash or {}) do
+    if #qs > 0 then
+      qs = qs .. '&'
+    end
+    qs = qs .. k .. '=' .. v
+  end
+
+  return qs
 end
 
 local function regexpify(pattern)
@@ -105,6 +120,13 @@ local function new(http_method, pattern, params, querystring_params, metric, del
   self.system_name = metric or error('missing metric name of rule')
   self.delta = delta
   self.last = last or false
+  self.qs_params = hash_to_query_string(querystring_params)
+
+  if string.find(self.pattern, '?', 1, true) then
+    self.rest_rule = rest_rule.new(http_method or 'ANY', pattern)
+  else
+    self.rest_rule = rest_rule.with_path_n_qs(http_method or 'ANY', pattern, self.qs_params)
+  end
 
   if owner_type == BackendAPIconst then
     self.owner_id = owner_id
@@ -160,7 +182,39 @@ function _M:matches(method, uri, args)
       self.querystring_params(args)
 
   -- match can be nil. Convert to boolean.
-  return match == true
+  local result = match == true
+
+  local qs_args = hash_to_query_string(args)
+  local rest_rule_result
+
+  if qs_args == '' then
+    rest_rule_result = self.rest_rule:matches(method or 'ANY', uri)
+  else
+    rest_rule_result = self.rest_rule:matches_path_n_qs(method or 'ANY', uri, hash_to_query_string(args))
+  end
+
+  if result ~= rest_rule_result then
+    print()
+    print('!!! START Mapping rule MISMATCH !!!')
+    print('!!! Test         : { method: ', method or 'ANY', ', uri: ', uri, ', qs_args: ', qs_args, ' }')
+    print('!!! APIcast rule : ', self:show_rule())
+    print('!!! 3scalers rule: ', self.rest_rule:debug())
+    print('!!!')
+    print('!!! APIcast  -> [', result, ']')
+    print('!!! 3scalers -> [', rest_rule_result, ']')
+    print('!!!')
+    print('!!! END   Mapping rule MISMATCH !!!')
+    print()
+    ngx.log(ngx.ERR, '!!! MISMATCH: For rule ', self:show_rule(), ': Apicast -> ', result, ' - Threescalers -> ', rest_rule_result, ' for ', method or 'ANY', ' ', uri, ', qs_args: ', qs_args)
+  end
+
+  -- Choose here whether to use apicast's or threescalers' result as return value
+  -- return result
+  return rest_rule_result
+end
+
+function _M:show_rule()
+  return '{ method: ', self.http_method or 'ANY', ', pattern: ', self.pattern, ', params: ', self.parameters, ', qs params: ', self.qs_params, ' }'
 end
 
 return _M
