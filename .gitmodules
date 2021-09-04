@@ -1,0 +1,4 @@
+[submodule "threescalers"]
+	path = threescalers/threescalers
+	url = https://github.com/3scale-rs/threescalers
+	branch = capi
