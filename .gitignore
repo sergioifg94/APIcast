@@ -14,3 +14,8 @@ tmp/benchmark/
 /vendor/cache
 /.docker
 /tmp/
+libthreescalers.so
+/.profile
+/.bashrc
+/.rustup/
+/.cargo/
