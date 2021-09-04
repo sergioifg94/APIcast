@@ -1,5 +1,8 @@
 .DEFAULT_GOAL := help
 
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+PROJECT_PATH := $(patsubst %/,%,$(dir $(MKFILE_PATH)))
+
 DOCKER_COMPOSE = docker-compose
 S2I = script/s2i
 REGISTRY ?= quay.io/3scale
@@ -22,6 +25,8 @@ DEVEL_DOCKERFILE ?= Dockerfile-development
 DEVEL_DOCKER_COMPOSE_FILE ?= docker-compose-devel.yml
 DEVEL_DOCKER_COMPOSE_VOLMOUNT_MAC_FILE ?= docker-compose-devel-volmount-mac.yml
 DEVEL_DOCKER_COMPOSE_VOLMOUNT_DEFAULT_FILE ?= docker-compose-devel-volmount-default.yml
+
+THREESCALERS ?= $(PROJECT_PATH)/threescalers/threescalers
 
 os = "$(shell uname -s)"
 
@@ -110,7 +115,7 @@ split-tests = $(shell echo $(1) | xargs -n 1 echo | circleci tests split --split
 
 BUSTED_PATTERN = "{spec,examples}/**/*_spec.lua"
 BUSTED_FILES ?= $(call circleci, $(BUSTED_PATTERN))
-busted: $(ROVER) lua_modules ## Test Lua.
+busted: $(ROVER) lua_modules threescalers ## Test Lua.
 	$(ROVER) exec bin/busted $(BUSTED_FILES) $(BUSTED_ARGS)
 ifeq ($(CI),true)
 	@- luacov
@@ -229,7 +234,7 @@ lua_modules: $(ROVER) $(S2I_CONTEXT)/Roverfile.lock
 lua_modules/bin/rover:
 	@LUAROCKS_CONFIG=$(S2I_CONTEXT)/config-5.1.lua luarocks install --server=http://luarocks.org/dev lua-rover --tree=lua_modules 1>&2
 
-dependencies: lua_modules carton  ## Install project dependencies
+dependencies: lua_modules carton threescalers ## Install project dependencies
 
 clean-containers: apicast-source
 	$(DOCKER_COMPOSE) down --volumes
@@ -267,6 +272,53 @@ benchmark:
 	DURATION=$$(( $(DURATION) / 10 )) $(DOCKER_COMPOSE) run wrk
 	## run the real benchmark for $(DURATION) seconds
 	$(DOCKER_COMPOSE) run wrk
+
+.PHONY: threescalers
+threescalers: threescalers-install # Build and setup libthreescalers.so for usage from Apicast and Busted.
+
+.PHONY: threescalers-clean
+threescalers-clean: threescalers-uninstall threescalers-crate-clean ## Clean the threescalers crate and uninstall everything.
+
+.PHONY: threescalers-build
+threescalers-build: $(THREESCALERS)/out/usr/lib64/libthreescalers.so ## Build the threescalers crate.
+
+.PHONY: threescalers-rebuild
+threescalers-rebuild: threescalers-crate-clean threescalers-build ## Clean and then build the threescalers crate.
+
+.PHONY: threescalers-test
+threescalers-test: $(ROVER) lua_modules threescalers ## Run threescalers unit tests
+	$(ROVER) exec bin/busted -v spec/threescalers $(BUSTED_ARGS)
+
+.PHONY: threescalers-crate-clean
+threescalers-crate-clean: ## Clean the threescalers crate
+	cd $(THREESCALERS) && cargo clean
+	rm -rf $(THREESCALERS)/out
+
+$(THREESCALERS)/out/usr/lib64/libthreescalers.so: # Build the threescalers crate
+	make -C $(THREESCALERS) so-build
+
+.PHONY: threescalers-install
+threescalers-install: $(PROJECT_PATH)/gateway/libthreescalers.so $(PROJECT_PATH)/libthreescalers.so ## Install the threescalers library.
+
+.PHONY: threescalers-uninstall
+threescalers-uninstall: threescalers-rmso threescalers-rmlink ## Uninstall the threescalers library.
+
+.PHONY: threescalers-reinstall
+threescalers-reinstall: threescalers-clean threescalers-install ## Uninstall, clean, rebuild and reinstall threescalers.
+
+$(PROJECT_PATH)/gateway/libthreescalers.so: $(THREESCALERS)/out/usr/lib64/libthreescalers.so ## Copy over the threescalers library to be used by Apicast
+	cp "$<" "$@"
+
+$(PROJECT_PATH)/libthreescalers.so: $(THREESCALERS)/out/usr/lib64/libthreescalers.so ## Link the threescalers library to be used by Busted
+	ln -s "$<" "$@"
+
+.PHONY: threescalers-rmso
+threescalers-rmso: ## Remove the threescalers library copy under /gateway
+	rm -f $(PROJECT_PATH)/gateway/libthreescalers.so
+
+.PHONY: threescalers-rmlink
+threescalers-rmlink: ## Remove the threescalers library link
+	rm -f $(PROJECT_PATH)/libthreescalers.so
 
 # Check http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help: ## Print this help
