@@ -21,4 +21,8 @@ end
 return {
   _all = all,
   default = default,
+  threescalers = {
+    table.unpack(default),
+    ROOT = { "spec/threescalers" },
+  }
 }
