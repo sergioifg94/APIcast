@@ -50,6 +50,10 @@ end
 local regex_variable = '\\{[-\\w_]+\\}'
 
 local function matches_querystring_params(params, args)
+  if args == nil then
+    args = {}
+  end
+
   local match = true
 
   for i=1, #params do
