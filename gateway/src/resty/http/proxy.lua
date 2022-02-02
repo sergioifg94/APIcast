@@ -73,7 +73,7 @@ end
 
 local function connect_proxy(httpc, request, skip_https_connect)
     local uri = request.uri
-    local host, port = httpc:resolve(uri.host, uri.port, uri)
+    --local host, port = httpc:resolve(uri.host, uri.port, uri)
     local proxy_uri = request.proxy
 
     if proxy_uri.scheme ~= 'http' then
@@ -94,15 +94,17 @@ local function connect_proxy(httpc, request, skip_https_connect)
     ngx.log(ngx.DEBUG, 'connection to ', proxy_uri.host, ':', proxy_uri.port, ' established',
         ', pool: ', options.pool, ' reused times: ', httpc:get_reused_times())
 
+    ngx.log(ngx.DEBUG, 'targeting server ', uri.host, ':', uri.port)
+
     if uri.scheme == 'http' then
         -- http proxy needs absolute URL as the request path
-        request.path = format('%s://%s:%s%s', uri.scheme, host, port, uri.path or '/')
+        request.path = format('%s://%s:%s%s', uri.scheme, uri.host, uri.port, uri.path or '/')
         return httpc
     elseif uri.scheme == 'https' and skip_https_connect then
-        request.path = format('%s://%s:%s%s', uri.scheme, host, port, request.path or '/')
+        request.path = format('%s://%s:%s%s', uri.scheme, uri.host, uri.port, request.path or '/')
         return _connect_tls_direct(httpc, request, host, port)
     elseif uri.scheme == 'https' then
-        return _connect_proxy_https(httpc, request, host, port)
+        return _connect_proxy_https(httpc, request, uri.host, uri.port)
 
     else
         return nil, 'invalid scheme'
