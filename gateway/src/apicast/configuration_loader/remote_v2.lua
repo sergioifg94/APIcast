@@ -104,7 +104,7 @@ local function endpoint_for_services_with_host(portal_endpoint, env, host)
   local query_args = encode_args({ host = host })
 
   return format(
-      "%s/admin/api/services/proxy/configs/%s.json?%s",
+      "%s/admin/api/account/proxy_configs/%s.json?%s",
       portal_endpoint,
       env,
       query_args

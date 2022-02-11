@@ -345,7 +345,7 @@ UwIDAQAB
         -- The important thing for this test is that it sends the request to
         -- the endpoint that returns services by host
         local endpoint = format(
-            "http://example.com/admin/api/services/proxy/configs/staging.json?%s",
+            "http://example.com/admin/api/account/proxy_configs/staging.json?%s",
             encode_args({ host = host })
         )
 
